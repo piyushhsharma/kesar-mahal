@@ -3,19 +3,20 @@ const CONFIG={formEndpoint:""};
 const ROOMS={royal:["Royal Suite","Private terrace over the lake"],heritage:["Heritage Suite","Hand-painted walls, carved teak"],garden:["Garden Room","Opens onto the courtyard"],lake:["Lake View Room","Sunrise over Pichola"]};
 const SCENES={
  intro:{art:"dark"},
- lake:{art:"lake",crumb:"LAKE PICHOLA",next:"arrival",auto:8000,line:"Dusk settles over the water."},
- arrival:{art:"gate",crumb:"ARRIVAL",next:"reception",auto:8000,line:"The gates of Kesar Mahal open."},
+ lake:{art:"lake",crumb:"LAKE PICHOLA",next:"arrival",line:"Dusk settles over the water."},
+ arrival:{art:"gate",crumb:"ARRIVAL",next:"reception",line:"The gates of Kesar Mahal open."},
  reception:{art:"hall",crumb:"RECEPTION",q:"What would you like to experience?",opts:[["Stay","Suites and rooms","rooms"],["Wedding","Ceremonies on the lake shore","enquiry:Wedding"],["Banquet","Feasts in the courtyard","enquiry:Banquet"],["Dining","The terrace at sunset","enquiry:Dining"],["Spa","Rituals of the royal court","enquiry:Spa"]]},
  rooms:{art:"hall",crumb:"RECEPTION",q:"Which room would you like to see?",opts:Object.entries(ROOMS).map(([k,v])=>[v[0],v[1],"room:"+k])},
  enquiry:{art:"desk",crumb:"ENQUIRY",light:1},
  seal:{art:"seal",crumb:"ENQUIRY",light:1}
 };
 const $=s=>document.querySelector(s),stage=$("#stage"),ui=$("#ui");
-let timer,topic="";
+let timer,topic="",cur="intro",until=0;const JOURNEY=["intro","lake","arrival","reception"];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 function makeLayer(id,art){
  const d=document.createElement("div");d.className="layer art-"+art;
+ if(id==="lake"){const c=document.createElement("canvas");c.className="lakecv";d.append(c);paintLake(c,d);const im=new Image();im.onload=()=>c.remove();im.src="assets/images/lake.jpg"}
  d.style.setProperty("--img",`url(assets/images/${id}.jpg)`); // missing file = code-made fallback shows
  const v=document.createElement("video");
  v.src=`assets/videos/${id}.mp4`;v.muted=v.loop=v.autoplay=v.playsInline=true;
@@ -23,8 +24,8 @@ function makeLayer(id,art){
  d.append(v);return d;
 }
 function view(n,sc,id){
- if(n==="intro")return `<div class="center"><div class="pip"></div><button class="enter" data-go="lake">ENTER UDAIPUR</button></div>`;
- if(sc.line)return `<p class="line">${sc.line}</p><button class="next" data-go="${sc.next}">CONTINUE</button>`;
+ if(n==="intro")return `<div class="center"><div class="pip"></div><button class="enter" data-go="lake">ENTER UDAIPUR</button></div><button class="cue" data-go="lake">SCROLL<i></i></button>`;
+ if(sc.line)return `<p class="line">${sc.line}</p><button class="cue" data-go="${sc.next}">SCROLL<i></i></button>`;
  if(sc.opts){
   const lab=sc.label?`<div class="tag">${esc(sc.label)}</div>`:`<h1 class="q">${sc.q}</h1>`;
   return `${lab}<ul class="menu">${sc.opts.map(o=>`<li><button data-go="${o[2]}"><b>${esc(o[0])}</b><small>${esc(o[1])}</small></button></li>`).join("")}${sc.q?`<li><button class="alt" data-go="enquiry:">Or simply make an enquiry</button></li>`:""}</ul>`;
@@ -40,7 +41,7 @@ function go(t){
  let [n,a]=t.split(":"),sc=SCENES[n],id=n;
  if(n==="room"){id="room-"+a;sc={art:"room",crumb:ROOMS[a][0].toUpperCase(),label:ROOMS[a][0],opts:[["Exit","Back to reception","reception"],["Enquire about this room","Write a letter","enquiry:"+ROOMS[a][0]],["Explore another","See the other rooms","rooms"]]};}
  if(n==="enquiry")topic=a||"";
- if(!sc)return;
+ if(!sc)return;cur=n;
  const L=makeLayer(id,sc.art);stage.append(L);void L.offsetWidth;L.classList.add("show");
  const old=[...stage.querySelectorAll(".layer")].filter(x=>x!==L);setTimeout(()=>old.forEach(x=>x.remove()),1500);
  ui.classList.add("out");
@@ -52,7 +53,16 @@ function go(t){
   const f=$("#f");if(f)f.onsubmit=async e=>{e.preventDefault();
    if(CONFIG.formEndpoint){try{await fetch(CONFIG.formEndpoint,{method:"POST",headers:{Accept:"application/json"},body:new FormData(f)})}catch(_){}}
    go("seal")};
-  if(sc.auto)timer=setTimeout(()=>go(sc.next),sc.auto);
  },500);
 }
+function step(d,wheel){const now=Date.now(),i=JOURNEY.indexOf(cur)+d;
+ if(now<until){if(wheel)until=Math.max(until,now+250);return}
+ if(JOURNEY.indexOf(cur)<0||i<0||i>=JOURNEY.length)return;
+ until=now+1800;go(JOURNEY[i])}
+addEventListener("wheel",e=>{if(Math.abs(e.deltaY)>10)step(e.deltaY>0?1:-1,1)},{passive:true});
+let ty=0;addEventListener("touchstart",e=>ty=e.touches[0].clientY,{passive:true});
+addEventListener("touchend",e=>{const d=ty-e.changedTouches[0].clientY;if(Math.abs(d)>50)step(d>0?1:-1)});
+addEventListener("keydown",e=>{const t=document.activeElement.tagName;
+ if(["ArrowDown","PageDown"].includes(e.key)||(e.key===" "&&!/BUTTON|INPUT|TEXTAREA/.test(t)))step(1);
+ if(["ArrowUp","PageUp"].includes(e.key))step(-1)});
 go("intro");
