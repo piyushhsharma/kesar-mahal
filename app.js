@@ -17,7 +17,7 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 function makeLayer(id,art){
  const d=document.createElement("div");d.className="layer art-"+art;
  if(id==="lake"){const c=document.createElement("canvas");c.className="lakecv";d.append(c);paintLake(c,d);const im=new Image();im.onload=()=>c.remove();im.src="assets/images/lake.jpg"}
- d.style.setProperty("--img",`url(assets/images/${id}.jpg)`); // missing file = code-made fallback shows
+ d.style.setProperty("--img",(id==="lake"&&innerHeight>innerWidth?"url(assets/images/lake-m.jpg),":"")+`url(assets/images/${id}.jpg)`); // missing file = code-made fallback shows
  const v=document.createElement("video");
  v.src=`assets/videos/${id}.mp4`;v.muted=v.loop=v.autoplay=v.playsInline=true;
  v.onplaying=()=>v.classList.add("on");v.onerror=()=>v.remove();
