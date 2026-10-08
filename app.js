@@ -19,8 +19,8 @@ function makeLayer(id,art){
  if(id==="lake"){const c=document.createElement("canvas");c.className="lakecv";d.append(c);paintLake(c,d);const im=new Image();im.onload=()=>c.remove();im.src="assets/images/lake.jpg"}
  d.style.setProperty("--img",(id==="lake"&&innerHeight>innerWidth?"url(assets/images/lake-m.jpg),":"")+`url(assets/images/${id}.jpg)`); // missing file = code-made fallback shows
  const v=document.createElement("video");
- v.src=`assets/videos/${id}.mp4`;v.muted=v.loop=v.autoplay=v.playsInline=true;
- v.onplaying=()=>v.classList.add("on");v.onerror=()=>v.remove();
+ v.src=`assets/videos/${id}.mp4`;v.muted=v.autoplay=v.playsInline=true;v.loop=false; // plays once, holds last frame
+ v.onplaying=()=>{v.classList.add("on");d.classList.add("vid")};v.onerror=()=>v.remove();
  d.append(v);return d;
 }
 function view(n,sc,id){
@@ -42,6 +42,7 @@ function go(t){
  if(n==="room"){id="room-"+a;sc={art:"room",crumb:ROOMS[a][0].toUpperCase(),label:ROOMS[a][0],opts:[["Exit","Back to reception","reception"],["Enquire about this room","Write a letter","enquiry:"+ROOMS[a][0]],["Explore another","See the other rooms","rooms"]]};}
  if(n==="enquiry")topic=a||"";
  if(!sc)return;cur=n;
+ const ni=JOURNEY.indexOf(n)+1;if(ni>0&&ni<JOURNEY.length){const p=document.createElement("video");p.preload="auto";p.muted=true;p.src=`assets/videos/${JOURNEY[ni]}.mp4`}
  const L=makeLayer(id,sc.art);stage.append(L);void L.offsetWidth;L.classList.add("show");
  const old=[...stage.querySelectorAll(".layer")].filter(x=>x!==L);setTimeout(()=>old.forEach(x=>x.remove()),1500);
  ui.classList.add("out");
