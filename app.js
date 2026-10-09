@@ -42,7 +42,8 @@ function go(t){
  if(n==="room"){id="room-"+a;sc={art:"room",crumb:ROOMS[a][0].toUpperCase(),label:ROOMS[a][0],opts:[["Exit","Back to reception","reception"],["Enquire about this room","Write a letter","enquiry:"+ROOMS[a][0]],["Explore another","See the other rooms","rooms"]]};}
  if(n==="enquiry")topic=a||"";
  if(!sc)return;cur=n;let wait=false;
- if(n==="reception"){if(seenRec)id="rooms";else{wait=true;seenRec=true}} // first visit plays the video, then shows the menu
+ if(n==="reception"){if(seenRec)id="rooms";else{wait=true;seenRec=true}}
+ if(n==="room")wait=true; // room clip plays, then the menu appears // first visit plays the video, then shows the menu
  const ni=JOURNEY.indexOf(n)+1;if(ni>0&&ni<JOURNEY.length){const p=document.createElement("video");p.preload="auto";p.muted=true;p.src=`assets/videos/${JOURNEY[ni]}.mp4`}
  const L=makeLayer(id,sc.art);stage.append(L);void L.offsetWidth;L.classList.add("show");
  ui.classList.toggle("hold",wait);
@@ -69,4 +70,5 @@ addEventListener("touchend",e=>{const d=ty-e.changedTouches[0].clientY;if(Math.a
 addEventListener("keydown",e=>{const t=document.activeElement.tagName;
  if(["ArrowDown","PageDown"].includes(e.key)||(e.key===" "&&!/BUTTON|INPUT|TEXTAREA/.test(t)))step(1);
  if(["ArrowUp","PageUp"].includes(e.key))step(-1)});
+ui.addEventListener("click",()=>ui.classList.remove("hold")); // tap to skip the wait
 go("intro");

@@ -14,7 +14,6 @@ html,body{height:100%;background:var(--ink);color:var(--cream);font-family:var(-
 .art-lake::after{left:0;right:0;top:36%;height:14%;background:#2b2f3a;clip-path:polygon(0 100%,0 60%,12% 40%,28% 55%,45% 20%,62% 50%,80% 30%,100% 55%,100% 100%)}
 .art-gate{--fb:radial-gradient(ellipse at 50% 55%,#ffd99a,#e9b878 35%,#b98a62 70%,#6f5440)}
 .art-hall{--fb:radial-gradient(ellipse at 50% 60%,#f6c98a,#d99b60 40%,#7a4e35 85%)}
-.art-gate::after,.art-hall::after{left:50%;bottom:0;width:min(34vw,420px);height:62%;transform:translateX(-50%);border-radius:999px 999px 0 0;background:radial-gradient(#fff3cf,#e7a85f);box-shadow:0 0 120px 40px #ffcf8a66;opacity:.8}
 .art-room{--fb:linear-gradient(#6b4a33,#c98d57 45%,#e2b074 60%,#7a4a2c)}
 .art-desk,.art-seal{--fb:linear-gradient(135deg,#efe6d6,#d9cdb8 50%,#f4eee2)}
 #crumb{position:fixed;top:max(22px,env(safe-area-inset-top));left:28px;z-index:3;font:300 12px/1.4 var(--sans);letter-spacing:.2em;opacity:.8;transition:opacity .6s}

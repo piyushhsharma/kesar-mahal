@@ -23,5 +23,6 @@ Images: `assets/images/<name>.jpg` (1920x1080, shown if no video)
 
 Tip: use one style line in every prompt, e.g. "warm golden-hour light, cinematic, shallow depth of field, 35mm".
 Keep the first frame of each video close to the matching image so crossfades feel seamless.
+
 ## Enquiries by email
 Create a free form at formspree.io, paste its URL into `CONFIG.formEndpoint` at the top of `app.js`.
