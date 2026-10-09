@@ -11,7 +11,7 @@ const SCENES={
  seal:{art:"seal",crumb:"ENQUIRY",light:1}
 };
 const $=s=>document.querySelector(s),stage=$("#stage"),ui=$("#ui");
-let timer,topic="",cur="intro",until=0;const JOURNEY=["intro","lake","arrival","reception"];
+let timer,topic="",cur="intro",until=0,seenRec=false;const JOURNEY=["intro","lake","arrival","reception"];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 function makeLayer(id,art){
@@ -41,9 +41,12 @@ function go(t){
  let [n,a]=t.split(":"),sc=SCENES[n],id=n;
  if(n==="room"){id="room-"+a;sc={art:"room",crumb:ROOMS[a][0].toUpperCase(),label:ROOMS[a][0],opts:[["Exit","Back to reception","reception"],["Enquire about this room","Write a letter","enquiry:"+ROOMS[a][0]],["Explore another","See the other rooms","rooms"]]};}
  if(n==="enquiry")topic=a||"";
- if(!sc)return;cur=n;
+ if(!sc)return;cur=n;let wait=false;
+ if(n==="reception"){if(seenRec)id="rooms";else{wait=true;seenRec=true}} // first visit plays the video, then shows the menu
  const ni=JOURNEY.indexOf(n)+1;if(ni>0&&ni<JOURNEY.length){const p=document.createElement("video");p.preload="auto";p.muted=true;p.src=`assets/videos/${JOURNEY[ni]}.mp4`}
  const L=makeLayer(id,sc.art);stage.append(L);void L.offsetWidth;L.classList.add("show");
+ ui.classList.toggle("hold",wait);
+ if(wait){const v=L.querySelector("video"),rev=()=>ui.classList.remove("hold");if(v){v.addEventListener("ended",rev);v.addEventListener("error",rev);setTimeout(rev,12000)}else rev()}
  const old=[...stage.querySelectorAll(".layer")].filter(x=>x!==L);setTimeout(()=>old.forEach(x=>x.remove()),1500);
  ui.classList.add("out");
  setTimeout(()=>{

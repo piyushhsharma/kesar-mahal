@@ -59,3 +59,4 @@ button:focus-visible,input:focus-visible,textarea:focus-visible{outline:1px soli
 .cue i{width:1px;height:40px;background:linear-gradient(var(--gold),transparent);animation:drip 2.2s infinite}
 @keyframes drip{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
 .layer.vid{animation:none}
+.q,.menu{transition:opacity 1.4s}#ui.hold .q,#ui.hold .menu{opacity:0;pointer-events:none}
